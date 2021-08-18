@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+        <title>Homepage - Realtime Chat</title>
+    </head>
+
+    <body>
+        <div class="container">
+            <div class="text-center m-4">
+                <h2>DannChat</h2>
+            </div>
+            <div class="row">
+                <div class="col-md-8 offset-2">
+                    <div class="card bg-secondary p-3">
+                        <div class="text-white ml-3">
+                            <button type="button" class="btn btn-secondary position-relative">
+                                Online
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
+                                    <span id="totalUserOnline"></span>
+                                    <span class="visually-hidden">unread messages</span>
+                                </span>
+                            </button>
+                        </div>
+                        
+                        <div id="message-list" style="height: 50vh; overflow-y: auto;" class="p-3">
+                            <!-- Message Here -->
+                        </div>
+
+                        <form id="form-message">
+                            <div class="row mt-3 p-3">
+                                <div class="col-10">
+                                    <input type="text" class="form-control" id="message">
+                                </div>
+                                <div class="col-2">
+                                    <button class="btn btn-primary" id="sendMessage">Send</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io();
+
+        socket.emit('join')
+        socket.on('message', (param) => {
+            alert('New Message');
+            $("#message-list").append(`
+                <div class="card mt-1">
+                    <div class="card-body">
+                        ${param.text}
+                    </div>
+                </div>
+            `);
+        })
+        
+        socket.on('countUserOnline', (countUserOnline) => {
+            $("#totalUserOnline").text(countUserOnline);
+            alert(countUserOnline);
+        })
+
+        $("#sendMessage").click(() => {
+            socket.emit('message', {
+                text: $("#message").val()
+            })
+        })
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
+
+</html>
